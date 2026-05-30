@@ -2,9 +2,9 @@ import streamlit as st
 import pickle
 import pandas as pd
 
-# ---------------------------
-# Page Config
-# ---------------------------
+# --------------------------------------------------
+# PAGE CONFIG
+# --------------------------------------------------
 
 st.set_page_config(
     page_title="Student Performance Predictor",
@@ -12,36 +12,130 @@ st.set_page_config(
     layout="wide"
 )
 
-# ---------------------------
-# Load Model
-# ---------------------------
+# --------------------------------------------------
+# CUSTOM CSS
+# --------------------------------------------------
+
+st.markdown("""
+<style>
+
+/* Animated Gradient Background */
+.stApp {
+    background: linear-gradient(
+        -45deg,
+        #0f172a,
+        #1e293b,
+        #312e81,
+        #0f766e
+    );
+    background-size: 400% 400%;
+    animation: gradient 15s ease infinite;
+    color: white;
+}
+
+@keyframes gradient {
+    0% {background-position:0% 50%;}
+    50% {background-position:100% 50%;}
+    100% {background-position:0% 50%;}
+}
+
+/* Sidebar */
+section[data-testid="stSidebar"] {
+    background: rgba(15,23,42,0.95);
+}
+
+/* Glass Cards */
+.metric-card {
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(12px);
+    padding: 20px;
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.15);
+    text-align: center;
+    transition: 0.3s;
+}
+
+.metric-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0px 10px 25px rgba(0,255,255,0.3);
+}
+
+/* Main Title */
+.main-title {
+    text-align:center;
+    font-size:50px;
+    font-weight:800;
+    color:#38bdf8;
+}
+
+/* Subtitle */
+.subtitle {
+    text-align:center;
+    color:#e2e8f0;
+    font-size:18px;
+}
+
+/* Buttons */
+.stButton > button {
+    background: linear-gradient(
+        90deg,
+        #06b6d4,
+        #3b82f6
+    );
+    color:white;
+    font-size:18px;
+    font-weight:bold;
+    border:none;
+    border-radius:12px;
+    height:55px;
+    width:100%;
+}
+
+.stButton > button:hover {
+    background: linear-gradient(
+        90deg,
+        #2563eb,
+        #8b5cf6
+    );
+}
+
+/* Dataframe */
+[data-testid="stDataFrame"] {
+    border-radius:15px;
+    overflow:hidden;
+}
+
+</style>
+""", unsafe_allow_html=True)
+
+# --------------------------------------------------
+# LOAD MODEL
+# --------------------------------------------------
 
 with open("student_model.pkl", "rb") as f:
     model = pickle.load(f)
 
-# ---------------------------
-# Title
-# ---------------------------
+# --------------------------------------------------
+# HEADER
+# --------------------------------------------------
 
-st.title("🎓 Student Performance Predictor")
-st.markdown(
-    """
-Predict student academic performance using Machine Learning.
+st.markdown("""
+<div class='main-title'>
+🎓 AI Student Performance Predictor
+</div>
+""", unsafe_allow_html=True)
 
-This system analyzes:
-- Attendance
-- Study Hours
-- Previous Grades
-- Extracurricular Activities
-- Parental Support
-"""
-)
+st.markdown("""
+<div class='subtitle'>
+Predict academic performance using Machine Learning
+</div>
+""", unsafe_allow_html=True)
 
-st.divider()
+st.markdown("---")
 
-# ---------------------------
-# Sidebar Inputs
-# ---------------------------
+# --------------------------------------------------
+# SIDEBAR INPUTS
+# --------------------------------------------------
 
 st.sidebar.header("📋 Student Information")
 
@@ -83,9 +177,9 @@ parent_support = st.sidebar.selectbox(
     ["Low", "Medium", "High"]
 )
 
-# ---------------------------
-# Encoding
-# ---------------------------
+# --------------------------------------------------
+# ENCODING
+# --------------------------------------------------
 
 gender_encoded = 1 if gender == "Male" else 0
 
@@ -97,32 +191,41 @@ parent_map = {
 
 parent_encoded = parent_map[parent_support]
 
-# ---------------------------
-# Dashboard Layout
-# ---------------------------
+# --------------------------------------------------
+# DASHBOARD CARDS
+# --------------------------------------------------
 
 col1, col2, col3 = st.columns(3)
 
-col1.metric(
-    "Attendance",
-    f"{attendance}%"
-)
+with col1:
+    st.markdown(f"""
+    <div class='metric-card'>
+        <h3>📅 Attendance</h3>
+        <h1>{attendance}%</h1>
+    </div>
+    """, unsafe_allow_html=True)
 
-col2.metric(
-    "Study Hours",
-    study_hours
-)
+with col2:
+    st.markdown(f"""
+    <div class='metric-card'>
+        <h3>📚 Study Hours</h3>
+        <h1>{study_hours}</h1>
+    </div>
+    """, unsafe_allow_html=True)
 
-col3.metric(
-    "Previous Grade",
-    previous_grade
-)
+with col3:
+    st.markdown(f"""
+    <div class='metric-card'>
+        <h3>🎯 Previous Grade</h3>
+        <h1>{previous_grade}</h1>
+    </div>
+    """, unsafe_allow_html=True)
 
-st.divider()
+st.markdown("---")
 
-# ---------------------------
-# Prediction Button
-# ---------------------------
+# --------------------------------------------------
+# PREDICT
+# --------------------------------------------------
 
 if st.button("🚀 Predict Performance"):
 
@@ -136,46 +239,86 @@ if st.button("🚀 Predict Performance"):
     ]]
 
     prediction = model.predict(sample)[0]
-
     prediction = round(prediction, 2)
 
-    st.subheader("📊 Prediction Result")
+    st.subheader("📊 Prediction Results")
 
     st.metric(
         "Predicted Final Grade",
         prediction
     )
 
-    progress = min(int(prediction), 100)
+    st.progress(min(int(prediction), 100))
 
-    st.progress(progress)
-
-    # -----------------------
-    # Performance Category
-    # -----------------------
+    # ---------------------------------------------
+    # CATEGORY
+    # ---------------------------------------------
 
     if prediction >= 90:
-        category = "🌟 Excellent"
-        color = "green"
+
+        st.balloons()
+
+        st.markdown("""
+        <div style="
+            background:#16a34a;
+            padding:20px;
+            border-radius:15px;
+            text-align:center;
+            font-size:28px;
+            font-weight:bold;">
+            🌟 Excellent Performance
+        </div>
+        """, unsafe_allow_html=True)
 
     elif prediction >= 75:
-        category = "✅ Good"
+
+        st.markdown("""
+        <div style="
+            background:#2563eb;
+            padding:20px;
+            border-radius:15px;
+            text-align:center;
+            font-size:28px;
+            font-weight:bold;">
+            ✅ Good Performance
+        </div>
+        """, unsafe_allow_html=True)
 
     elif prediction >= 60:
-        category = "⚠️ Average"
+
+        st.markdown("""
+        <div style="
+            background:#ea580c;
+            padding:20px;
+            border-radius:15px;
+            text-align:center;
+            font-size:28px;
+            font-weight:bold;">
+            ⚠️ Average Performance
+        </div>
+        """, unsafe_allow_html=True)
 
     else:
-        category = "❌ Needs Improvement"
 
-    st.success(
-        f"Performance Category: {category}"
-    )
+        st.markdown("""
+        <div style="
+            background:#dc2626;
+            padding:20px;
+            border-radius:15px;
+            text-align:center;
+            font-size:28px;
+            font-weight:bold;">
+            ❌ Needs Improvement
+        </div>
+        """, unsafe_allow_html=True)
 
-    # -----------------------
-    # Recommendations
-    # -----------------------
+    st.markdown("---")
 
-    st.subheader("💡 Recommendations")
+    # ---------------------------------------------
+    # RECOMMENDATIONS
+    # ---------------------------------------------
+
+    st.subheader("💡 Personalized Recommendations")
 
     recommendations = []
 
@@ -191,7 +334,7 @@ if st.button("🚀 Predict Performance"):
 
     if previous_grade < 70:
         recommendations.append(
-            "Focus on strengthening core concepts."
+            "Strengthen understanding of core subjects."
         )
 
     if extracurricular == 0:
@@ -201,20 +344,22 @@ if st.button("🚀 Predict Performance"):
 
     if parent_support == "Low":
         recommendations.append(
-            "Seek mentorship and academic guidance."
+            "Seek guidance from mentors or teachers."
         )
 
     if len(recommendations) == 0:
         recommendations.append(
-            "Excellent work! Maintain your current performance."
+            "Excellent work! Maintain your current habits."
         )
 
     for rec in recommendations:
-        st.write("✔️", rec)
+        st.success(rec)
 
-    # -----------------------
-    # Student Summary
-    # -----------------------
+    st.markdown("---")
+
+    # ---------------------------------------------
+    # SUMMARY TABLE
+    # ---------------------------------------------
 
     st.subheader("📝 Student Summary")
 
@@ -242,8 +387,12 @@ if st.button("🚀 Predict Performance"):
         use_container_width=True
     )
 
-st.divider()
+# --------------------------------------------------
+# FOOTER
+# --------------------------------------------------
+
+st.markdown("---")
 
 st.caption(
-    "Developed using Streamlit, Scikit-Learn and Random Forest Regression"
+    "Developed using Streamlit • Scikit-Learn • Random Forest Regression"
 )
