@@ -146,6 +146,8 @@ The trained model is saved using Pickle for deployment.
 | R² Score | 0.79  |
 
 The model explains approximately 79% of the variance in student performance, demonstrating strong predictive capability.
+<img width="790" height="490" alt="image" src="https://github.com/user-attachments/assets/dd147453-b202-48c0-9afc-15a0fb965099" />
+
 
 ---
 
